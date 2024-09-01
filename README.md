@@ -13,7 +13,7 @@
   </a>
 </p>
 
-# Swift UrlRequest Builder
+# Swift Request
 
 A library extending a URLRequest instance in a ergonomic, scalable, composable and testable manner.
 
@@ -46,16 +46,26 @@ We have two ways to make calls, a simple one by passing a URL and another, more 
 
 In small applications that do not make many calls, it does not make much sense to ergonomicize the system. But, as we have to manage many calls, the complexity of the system will appear.
 
+### Builders
 
+![image](screenshot.jpg)
 
-## Functionalities
+### Demo
 
-### Simplify UrlRequests
+Check the demostration in the Demo/App folder.
 
-### Builders for simplifying even more
+* Run the server scheme. First, you need to setup a docker image like this.
 
-## Use Cases
+```
+docker run --name postgres -e POSTGRES_DB=vapor_database \
+  -e POSTGRES_USER=vapor_username \
+  -e POSTGRES_PASSWORD=vapor_password \
+  -p 5432:5432 -d postgres
+```
 
-### Mappable (decoding and encoding)
+* Then, run the App scheme. App client is developed using The Composable Architecture. If you want to see how to use this library, check the ApiClient package.
 
-### CRUD
+### Credits
+
+* The Composable Architecture, by Pointfree.
+* Server-Side Swift with Vapor, by Tim Condon (Kodeco editor)

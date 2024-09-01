@@ -28,7 +28,7 @@ let package = Package(
 		.package(url: "https://github.com/apple/swift-nio.git", from: "2.70.0"),
 		.package(url: "https://github.com/pointfreeco/swift-composable-architecture", exact:"1.13.1"),
 		.package(url: "https://github.com/vapor/leaf.git", from: "4.4.0"),
-		.package(path: "../")
+		.package(name: "swift-request", path: "../")
 	],
 	targets: [
 		.executableTarget(
@@ -57,7 +57,7 @@ let package = Package(
 			name: "ApiClient",
 			dependencies: [
 				.product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-				.product(name: "Request", package: "swift-urlrequest-builder"),
+				.product(name: "Request", package: "swift-request"),
 				"Models"
 			],
 			path: "Sources/App/ApiClient"
