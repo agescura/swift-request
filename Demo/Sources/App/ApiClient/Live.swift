@@ -1,12 +1,14 @@
 import ComposableArchitecture
 import Dependencies
 import Foundation
+import Request
 
 extension ApiClient: DependencyKey {
 	public static var liveValue: Self = {
-		let session = URLSession.shared
-		
+		let session = Session()
+
 		actor Session {
+			private let shared = URLSession.shared
 			nonisolated let value: Isolated<String?>
 			
 			init(
@@ -15,6 +17,8 @@ extension ApiClient: DependencyKey {
 				self.value = Isolated(value)
 			}
 			
+			var isLoggedIn: Bool { self.value.value != nil }
+			
 			func logout() {
 				self.value.value = nil
 			}
@@ -22,21 +26,34 @@ extension ApiClient: DependencyKey {
 			func set(value: String) {
 				self.value.value = value
 			}
+			
+			@discardableResult
+			public func data<D: Decodable, E: Encodable>(
+				for request: Request<D, E>
+			) async throws -> D {
+				try await self.shared.data(for: request)
+			}
+			
+			@discardableResult
+			public func data<E: Encodable>(
+				for request: Request<Void, E>
+			) async throws -> Data {
+				try await self.shared.data(for: request)
+			}
 		}
-		let session2 = Session()
 		
 		return Self(
 			acronyms: { try await session.data(for: Acronyms.get) },
 			addAcronym: {
-				guard let value = session2.value.value else { fatalError() }
+				guard let value = session.value.value else { fatalError() }
 				return try await session.data(for: Acronyms.add($0, token: value))
 			},
 			deleteAcronym: {
-				guard let value = session2.value.value else { fatalError() }
+				guard let value = session.value.value else { fatalError() }
 				try await session.data(for: Acronyms.delete($0, token: value))
 			},
 			editAcronym: {
-				guard let value = session2.value.value else { fatalError() }
+				guard let value = session.value.value else { fatalError() }
 				return try await session.data(for: Acronyms.edit($0, token: value))
 			},
 			firstAcronym: { try await session.data(for: Acronyms.first) },
@@ -53,10 +70,10 @@ extension ApiClient: DependencyKey {
 			
 			login: {
 				let token = try await session.data(for: Users.login($0, $1))
-				session2.value.value = token.value
+				session.value.value = token.value
 			},
-			isLoggedIn: { session2.value.value != nil },
-			logout: { session2.value.value = nil },
+			isLoggedIn: { await session.isLoggedIn },
+			logout: { await session.logout() },
 			
 			categories: { try await session.data(for: Categories.get) },
 			addCategory: { try await session.data(for: Categories.add($0)) },
@@ -75,11 +92,17 @@ extension ApiClient: DependencyKey {
 }
 
 public struct Token: Decodable {
+	public let id: UUID
+	public let user: User
 	public let value: String
+	
+	public struct User: Decodable {
+		public let id: UUID
+	}
 }
 
 extension Token {
-	static let mock = Token(value: "token")
+	static let mock = Token(id: UUID(), user: User(id: UUID()), value: "token")
 }
 
 @dynamicMemberLookup
