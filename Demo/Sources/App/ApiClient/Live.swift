@@ -3,6 +3,17 @@ import Dependencies
 import Foundation
 import Request
 
+extension Request {
+	public mutating func addIfNeeded(bearer token: Isolated<String?>) {
+		if
+			self.authorization == .bearer,
+			let value = token.value
+		{
+			self.headers.insert(bearer: value)
+		}
+	}
+}
+
 extension ApiClient: DependencyKey {
 	public static var liveValue: Self = {
 		let session = Session()
@@ -28,34 +39,36 @@ extension ApiClient: DependencyKey {
 			}
 			
 			@discardableResult
-			public func data<D: Decodable, E: Encodable>(
+			func data<D: Decodable, E: Encodable>(
 				for request: Request<D, E>
 			) async throws -> D {
-				try await self.shared.data(for: request)
+				var request = request
+				request.addIfNeeded(bearer: value)
+				return try await self.shared.data(for: request)
 			}
 			
 			@discardableResult
-			public func data<E: Encodable>(
+			func data<E: Encodable>(
 				for request: Request<Void, E>
 			) async throws -> Data {
-				try await self.shared.data(for: request)
+				var request = request
+				request.addIfNeeded(bearer: value)
+				return try await self.shared.data(for: request)
+			}
+			
+			func auth(
+				for request: RequestDecodable<Token>
+			) async throws -> Void {
+				let token = try await self.shared.data(for: request)
+				self.set(value: token.value)
 			}
 		}
 		
 		return Self(
 			acronyms: { try await session.data(for: Acronyms.get) },
-			addAcronym: {
-				guard let value = session.value.value else { fatalError() }
-				return try await session.data(for: Acronyms.add($0, token: value))
-			},
-			deleteAcronym: {
-				guard let value = session.value.value else { fatalError() }
-				try await session.data(for: Acronyms.delete($0, token: value))
-			},
-			editAcronym: {
-				guard let value = session.value.value else { fatalError() }
-				return try await session.data(for: Acronyms.edit($0, token: value))
-			},
+			addAcronym: { try await session.data(for: Acronyms.add($0)) },
+			deleteAcronym: { try await session.data(for: Acronyms.delete($0)) },
+			editAcronym: { try await session.data(for: Acronyms.edit($0)) },
 			firstAcronym: { try await session.data(for: Acronyms.first) },
 			searchAcronyms: { try await session.data(for: Acronyms.search($0)) },
 			sortedAcronyms: { try await session.data(for: Acronyms.sorted) },
@@ -68,10 +81,7 @@ extension ApiClient: DependencyKey {
 			searchUsers: { try await session.data(for: Users.search($0)) },
 			sortedUsers: { try await session.data(for: Users.sorted) },
 			
-			login: {
-				let token = try await session.data(for: Users.login($0, $1))
-				session.value.value = token.value
-			},
+			login: { try await session.auth(for: Users.login($0, $1)) },
 			isLoggedIn: { await session.isLoggedIn },
 			logout: { await session.logout() },
 			

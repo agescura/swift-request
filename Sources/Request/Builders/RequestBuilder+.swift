@@ -281,4 +281,61 @@ extension RequestBuilder {
 			headers: [header.key: header.value, "Content-Type": "application/json"]
 		)
 	}
+	
+	static public func buildBlock<D, E: Encodable>(
+		_ request: RequestBase,
+		_ method: Method,
+		_ body: Body<E>,
+		_ authorization: Authorization
+	) -> Request<D, E> {
+		Request(
+			scheme: request.scheme,
+			host: request.host,
+			port: request.port,
+			uri: request.uri,
+			queryItems: request.queryItems,
+			method: method.value,
+			httpBody: .encodable(body.value),
+			headers: ["Content-Type": "application/json"],
+			authorization: .bearer
+		)
+	}
+	
+	static public func buildBlock<D, E: Encodable>(
+		_ request: RequestBase,
+		_ uri: Uri,
+		_ method: Method,
+		_ authorization: Authorization
+	) -> Request<D, E> {
+		Request(
+			scheme: request.scheme,
+			host: request.host,
+			port: request.port,
+			uri: request.uri + uri.value,
+			queryItems: request.queryItems,
+			method: method.value,
+			headers: ["Content-Type": "application/json"],
+			authorization: .bearer
+		)
+	}
+	
+	static public func buildBlock<D, E: Encodable>(
+		_ request: RequestBase,
+		_ uri: Uri,
+		_ method: Method,
+		_ body: Body<E>,
+		_ authorization: Authorization
+	) -> Request<D, E> {
+		Request(
+			scheme: request.scheme,
+			host: request.host,
+			port: request.port,
+			uri: request.uri + uri.value,
+			queryItems: request.queryItems,
+			method: method.value,
+			httpBody: .encodable(body.value),
+			headers: ["Content-Type": "application/json"],
+			authorization: .bearer
+		)
+	}
 }

@@ -78,28 +78,28 @@ struct Acronyms {
 	}
 	
 	@RequestBuilder
-	static func add(_ acronym: Acronym, token: String) -> Request<Acronym, Acronym.AcronymData> {
+	static func add(_ acronym: Acronym) -> Request<Acronym, Acronym.AcronymData> {
 		base
 		Method(.post)
 		Body(acronym.dto)
-		Header(.authorization(.bearer(token)))
+		Authorization(.bearer)
 	}
 	
 	@RequestBuilder
-	static func edit(_ acronym: Acronym, token: String) -> Request<Acronym, Acronym.AcronymData> {
+	static func edit(_ acronym: Acronym) -> Request<Acronym, Acronym.AcronymData> {
 		base
 		Uri(acronym.id)
 		Method(.put)
 		Body(acronym.dto)
-		Header(.authorization(.bearer(token)))
+		Authorization(.bearer)
 	}
 	
 	@RequestBuilder
-	static func delete(_ acronym: Acronym, token: String) -> RequestPlain {
+	static func delete(_ acronym: Acronym) -> RequestPlain {
 		base
 		Uri(acronym.id)
 		Method(.delete)
-		Header(.authorization(.bearer(token)))
+		Authorization(.bearer)
 	}
 }
 

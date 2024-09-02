@@ -1,5 +1,13 @@
 import Foundation
 
+public typealias Headers = [String: String]
+
+extension Headers {
+	public mutating func insert(bearer: String) {
+		self["Authorization"] = "Bearer \(bearer)"
+	}
+}
+
 public struct Request<D, E: Encodable> {
 	public var scheme: HTTPScheme
 	public var host: String
@@ -8,7 +16,7 @@ public struct Request<D, E: Encodable> {
 	public var queryItems: [Query]
 	public var method: HTTPMethod
 	public var httpBody: HTTPBody<E>?
-	public var headers: [String: String]
+	public var headers: Headers
 	public var encoder: JSONEncoder
 	public var decoder: JSONDecoder
 	public var cachePolicy: URLRequest.CachePolicy
@@ -24,6 +32,11 @@ public struct Request<D, E: Encodable> {
 	// httpBodyStream
 	public var httpShouldHandleCookies: Bool
 	public var httpShouldUsePipelining: Bool
+	public var authorization: Authorization?
+	
+	public enum Authorization {
+		case basic, bearer
+	}
 	
 	public init(
 		scheme: HTTPScheme = .https,
@@ -33,7 +46,7 @@ public struct Request<D, E: Encodable> {
 		queryItems: [Query] = [],
 		method: HTTPMethod = .get,
 		httpBody: HTTPBody<E>? = nil,
-		headers: [String: String] = [:],
+		headers: Headers = Headers(),
 		encoder: JSONEncoder = JSONEncoder(),
 		decoder: JSONDecoder = JSONDecoder(),
 		cachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy,
@@ -48,7 +61,8 @@ public struct Request<D, E: Encodable> {
 		requiresDNSSECValidation: Bool = false,
 		// httpBodyStream
 		httpShouldHandleCookies: Bool = true,
-		httpShouldUsePipelining: Bool = false
+		httpShouldUsePipelining: Bool = false,
+		authorization: Authorization? = nil
 	) {
 		self.scheme = scheme
 		self.host = host
@@ -73,6 +87,7 @@ public struct Request<D, E: Encodable> {
 		// httpBodyStream
 		self.httpShouldHandleCookies = httpShouldHandleCookies
 		self.httpShouldUsePipelining = httpShouldUsePipelining
+		self.authorization = authorization
 	}
 }
 
