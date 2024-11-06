@@ -22,11 +22,11 @@ let package = Package(
 		.library(name: "UserFeature", targets: ["UserFeature"])
 	],
 	dependencies: [
-		.package(url: "https://github.com/vapor/vapor.git", from: "4.104.0"),
-		.package(url: "https://github.com/vapor/fluent.git", from: "4.11.0"),
-		.package(url: "https://github.com/vapor/fluent-postgres-driver.git", from: "2.9.2"),
-		.package(url: "https://github.com/apple/swift-nio.git", from: "2.70.0"),
-		.package(url: "https://github.com/pointfreeco/swift-composable-architecture", exact:"1.13.1"),
+		.package(url: "https://github.com/vapor/vapor.git", from: "4.106.1"),
+		.package(url: "https://github.com/vapor/fluent.git", from: "4.12.0"),
+		.package(url: "https://github.com/vapor/fluent-postgres-driver.git", from: "2.10.0"),
+		.package(url: "https://github.com/apple/swift-nio.git", from: "2.76.0"),
+		.package(url: "https://github.com/pointfreeco/swift-composable-architecture", exact:"1.15.2"),
 		.package(url: "https://github.com/vapor/leaf.git", from: "4.4.0"),
 		.package(name: "swift-request", path: "../")
 	],

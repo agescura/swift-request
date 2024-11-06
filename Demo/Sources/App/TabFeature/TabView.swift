@@ -16,13 +16,13 @@ public struct TabFeature {
 		@Presents public var login: LoginFeature.State?
 		public var home: HomeFeature.State
 		public var search: SearchFeature.State
-		public var selectedTab: Tab
+		public var selectedTab: Models.Tab
 		public init(
 			list: ListFeature.State = ListFeature.State(),
 			login: LoginFeature.State? = LoginFeature.State(),
 			home: HomeFeature.State = HomeFeature.State(),
 			search: SearchFeature.State = SearchFeature.State(),
-			selectedTab: Tab = .home
+			selectedTab: Models.Tab = .home
 		) {
 			self.list = list
 			self.login = login
@@ -36,7 +36,7 @@ public struct TabFeature {
 		case login(PresentationAction<LoginFeature.Action>)
 		case home(HomeFeature.Action)
 		case search(SearchFeature.Action)
-		case tabChanged(Tab)
+		case tabChanged(Models.Tab)
 	}
 	public var body: some ReducerOf<Self> {
 		Scope(state: \.list, action: \.list) {

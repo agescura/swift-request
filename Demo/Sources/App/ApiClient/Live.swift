@@ -82,8 +82,8 @@ extension ApiClient: DependencyKey {
 			sortedUsers: { try await session.data(for: Users.sorted) },
 			
 			login: { try await session.auth(for: Users.login($0, $1)) },
-			isLoggedIn: { await session.isLoggedIn },
-			logout: { await session.logout() },
+			isLoggedIn: { session.isLoggedIn },
+			logout: { session.logout() },
 			
 			categories: { try await session.data(for: Categories.get) },
 			addCategory: { try await session.data(for: Categories.add($0)) },
